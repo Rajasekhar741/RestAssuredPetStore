@@ -1,0 +1,37 @@
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+*.iml
+
+# Maven
+target/
+*.jar
+*.war
+*.ear
+dependency-reduced-pom.xml
+.m2/
+
+# Gradle
+.gradle/
+build/
+
+# Test Reports
+allure-results/
+surefire-reports/
+test-output/
+
+# Logs
+*.log
+
+# Others
+.classpath
+.project
+.settings/
+bin/
+out/
+dist/
+*.zip

@@ -1,0 +1,10 @@
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd" >
+<suite name="PetStore API Test Suite" verbose="2" parallel="tests" thread-count="1">
+    <test name="Pet Store Tests">
+        <classes>
+            <class name="com.petstore.tests.PetApiTests"/>
+            <class name="com.petstore.tests.StoreApiTests"/>
+            <class name="com.petstore.tests.UserApiTests"/>
+        </classes>
+    </test>
+</suite>
