@@ -1,7 +1,6 @@
 package com.petstore.utils;
 
 import io.restassured.response.Response;
-import static org.assertj.core.api.Assertions.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,9 +15,10 @@ public class AssertionHelper {
      */
     public static void assertStatusCode(Response response, int expectedCode) {
         logger.info("Asserting status code: {}", expectedCode);
-        assertThat(response.statusCode())
-                .as("Expected status code")
-                .isEqualTo(expectedCode);
+        int actual = response.statusCode();
+        if (actual != expectedCode) {
+            throw new AssertionError("Expected status code " + expectedCode + " but got " + actual);
+        }
     }
 
     /**
@@ -27,7 +27,9 @@ public class AssertionHelper {
     public static void assertResponseSuccess(Response response) {
         int statusCode = response.statusCode();
         logger.info("Asserting successful response, status code: {}", statusCode);
-        assertThat(statusCode).isBetween(200, 299);
+        if (statusCode < 200 || statusCode > 299) {
+            throw new AssertionError("Expected successful status code (2xx) but got " + statusCode);
+        }
     }
 
     /**
@@ -35,9 +37,10 @@ public class AssertionHelper {
      */
     public static void assertResponseContainsKey(Response response, String key) {
         logger.info("Asserting response contains key: {}", key);
-        assertThat(response.jsonPath().get(key))
-                .as("Response should contain key: " + key)
-                .isNotNull();
+        Object value = response.jsonPath().get(key);
+        if (value == null) {
+            throw new AssertionError("Response should contain key: " + key);
+        }
     }
 
     /**
@@ -46,9 +49,9 @@ public class AssertionHelper {
     public static void assertJsonPath(Response response, String jsonPath, Object expectedValue) {
         logger.info("Asserting JSON path '{}' equals '{}'", jsonPath, expectedValue);
         Object actualValue = response.jsonPath().get(jsonPath);
-        assertThat(actualValue)
-                .as("JSON path: " + jsonPath)
-                .isEqualTo(expectedValue);
+        if (!actualValue.equals(expectedValue)) {
+            throw new AssertionError("JSON path '" + jsonPath + "': expected " + expectedValue + " but got " + actualValue);
+        }
     }
 
     /**
@@ -56,9 +59,10 @@ public class AssertionHelper {
      */
     public static void assertHeaderExists(Response response, String headerName) {
         logger.info("Asserting header exists: {}", headerName);
-        assertThat(response.getHeader(headerName))
-                .as("Header should exist: " + headerName)
-                .isNotNull();
+        String headerValue = response.getHeader(headerName);
+        if (headerValue == null) {
+            throw new AssertionError("Header should exist: " + headerName);
+        }
     }
 
     /**
@@ -66,9 +70,10 @@ public class AssertionHelper {
      */
     public static void assertHeaderValue(Response response, String headerName, String expectedValue) {
         logger.info("Asserting header '{}' equals '{}'", headerName, expectedValue);
-        assertThat(response.getHeader(headerName))
-                .as("Header: " + headerName)
-                .isEqualTo(expectedValue);
+        String actualValue = response.getHeader(headerName);
+        if (!actualValue.equals(expectedValue)) {
+            throw new AssertionError("Header '" + headerName + "': expected " + expectedValue + " but got " + actualValue);
+        }
     }
 
     /**
@@ -76,9 +81,10 @@ public class AssertionHelper {
      */
     public static void assertResponseBodyContains(Response response, String text) {
         logger.info("Asserting response body contains: {}", text);
-        assertThat(response.getBody().asString())
-                .as("Response body")
-                .contains(text);
+        String body = response.getBody().asString();
+        if (!body.contains(text)) {
+            throw new AssertionError("Response body should contain: " + text);
+        }
     }
 
     /**
@@ -87,8 +93,8 @@ public class AssertionHelper {
     public static void assertResponseTime(Response response, long maxTimeMs) {
         long responseTime = response.getTime();
         logger.info("Asserting response time {} is less than {}ms", responseTime, maxTimeMs);
-        assertThat(responseTime)
-                .as("Response time should be less than " + maxTimeMs + "ms")
-                .isLessThan(maxTimeMs);
+        if (responseTime >= maxTimeMs) {
+            throw new AssertionError("Response time should be less than " + maxTimeMs + "ms but got " + responseTime + "ms");
+        }
     }
 }
